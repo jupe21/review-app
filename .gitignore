@@ -7,3 +7,5 @@ node_modules/
 # config.js se generira med build procesom iz env variabel.
 # Lokalno ga lahko imaš (z USE_MOCK: true). Ne commitaj pravih ključev!
 config.js
+
+.vercel
