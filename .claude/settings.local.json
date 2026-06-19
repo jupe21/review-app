@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --check review.js)",
+      "Bash(node --check dashboard.js)",
+      "Bash(node --check mock-data.js)",
+      "Bash(node --check generate-config.js)",
+      "Bash(SUPABASE_URL=\"https://demo.supabase.co\" SUPABASE_ANON_KEY=\"anon123\" SUPABASE_SERVICE_KEY=\"svc123\" DASHBOARD_PASSWORD=\"tajno\" node generate-config.js)",
+      "Bash(pkill -f \"http.server 8080\")",
+      "mcp__Claude_Preview__preview_start",
+      "PowerShell(Stop-Process -Id 28680 -Force -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue)",
+      "PowerShell(\"done\")"
+    ]
+  }
+}

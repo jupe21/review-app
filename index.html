@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="sl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Vaše mnenje</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="review-page">
+      <div class="card">
+        <!-- KORAK 1: ocena -->
+        <section id="step-rate" class="step active">
+          <h1>Kako zadovoljni ste bili?</h1>
+          <p class="subtitle">Vaše mnenje nam veliko pomeni.</p>
+
+          <div class="stars" id="stars" role="radiogroup" aria-label="Ocena od 1 do 5 zvezdic">
+            <button class="star" type="button" data-value="1" aria-label="1 zvezdica">★</button>
+            <button class="star" type="button" data-value="2" aria-label="2 zvezdici">★</button>
+            <button class="star" type="button" data-value="3" aria-label="3 zvezdice">★</button>
+            <button class="star" type="button" data-value="4" aria-label="4 zvezdice">★</button>
+            <button class="star" type="button" data-value="5" aria-label="5 zvezdic">★</button>
+          </div>
+
+          <p class="hint" id="rate-hint"></p>
+
+          <button class="btn" id="btn-next" disabled>Naprej</button>
+        </section>
+
+        <!-- KORAK 2: vmesni korak za 4 zvezde -->
+        <section id="step-four" class="step">
+          <div class="thanks-icon">🙂</div>
+          <h1>Hvala za oceno!</h1>
+          <p class="subtitle">
+            Bi nam pomagali z oceno tudi na Googlu? Traja le trenutek.
+          </p>
+          <button class="btn btn-google" id="btn-four-google">Odpri Google recenzije</button>
+          <button class="btn-link" id="btn-four-no">Raje ne, hvala</button>
+        </section>
+
+        <!-- KORAK 3: feedback za 1–3 zvezde -->
+        <section id="step-feedback" class="step">
+          <h1>Žal nam je.</h1>
+          <p class="subtitle">Povejte nam, kaj je šlo narobe — popravili bomo.</p>
+          <textarea
+            id="feedback-text"
+            placeholder="Opišite vašo izkušnjo..."
+            aria-label="Opišite vašo izkušnjo"
+          ></textarea>
+          <button class="btn" id="btn-send">Pošlji</button>
+        </section>
+
+        <!-- KORAK 4: zahvala po feedbacku -->
+        <section id="step-thanks" class="step">
+          <div class="thanks-icon">✅</div>
+          <h1>Hvala za sporočilo</h1>
+          <p class="subtitle">Upoštevali bomo vaše mnenje.</p>
+        </section>
+
+        <!-- KORAK 5: napaka (manjkajoča/neveljavna lokacija) -->
+        <section id="step-error" class="step">
+          <div class="thanks-icon">⚠️</div>
+          <h1>Lokacija ni najdena</h1>
+          <p class="subtitle" id="error-text">
+            Povezava ni veljavna. Prosimo, ponovno skenirajte kodo.
+          </p>
+        </section>
+      </div>
+    </main>
+
+    <!-- Supabase JS client (uporabljen, ko USE_MOCK = false) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="mock-data.js"></script>
+    <script src="review.js"></script>
+  </body>
+</html>

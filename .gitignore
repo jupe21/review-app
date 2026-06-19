@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.local
+.vercel
+.DS_Store
+
+# config.js se generira med build procesom iz env variabel.
+# Lokalno ga lahko imaš (z USE_MOCK: true). Ne commitaj pravih ključev!
+config.js
