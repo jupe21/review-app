@@ -12,9 +12,10 @@ Preprosta review board aplikacija za zbiranje mnenj strank.
 ## Struktura
 
 ```
-index.html          # review stran
-dashboard.html      # dashboard (lastnik – svoje lokacije)
-admin.html          # admin board (skrbnik – vse lokacije)
+index.html          # landing stran (domena /)
+review.html         # review stran (/review, odpre se prek QR /?loc=ID)
+dashboard.html      # dashboard (lastnik, svoje lokacije)
+admin.html          # admin board (skrbnik, vse lokacije)
 style.css           # skupni stili
 review.js           # logika review strani
 dashboard.js        # logika dashboarda
@@ -43,8 +44,10 @@ python -m http.server 8080
 npx serve .
 ```
 
-- Review stran: <http://localhost:8080/?loc=test>
+- Landing: <http://localhost:8080/>
+- Review stran: <http://localhost:8080/?loc=test> (preusmeri na `review.html?loc=test`)
 - Dashboard: <http://localhost:8080/dashboard.html> (geslo: `geslo123`)
+- Admin: <http://localhost:8080/admin.html>
 
 > Opomba: stran odpri prek strežnika (`http://…`), **ne** kot `file://`, sicer brskalnik ne naloži skript pravilno.
 
@@ -98,18 +101,20 @@ insert into locations (id, name, google_review_url, owner_email) values
 
 ## 3. QR koda za lokacijo
 
-Stranka odpre review stran prek povezave oblike:
+Na goli domeni (`https://tvoja-domena.com`) je **landing stran**. Review stran se odpre prek povezave z oznako lokacije:
 
 ```
 https://tvoja-domena.com/?loc=ABC123
 ```
+
+Ta se samodejno preusmeri na `/review?loc=ABC123`, zato stare QR kode delujejo naprej. Nove lahko delaš tudi neposredno na `/review?loc=ABC123`.
 
 QR kodo iz te povezave ustvariš s katerim koli generatorjem, npr.:
 
 - <https://www.qr-code-generator.com>
 - ali CLI: `npx qrcode "https://tvoja-domena.com/?loc=ABC123" -o abc123.png`
 
-Natisni QR kodo / nalepko in jo postavi na mizo, blagajno ali pošlji prek NFC nalepke.
+Natisni QR kodo ali nalepko in jo postavi na mizo, blagajno ali pošlji prek NFC nalepke.
 
 ---
 
