@@ -86,9 +86,11 @@
   async function getLocation(locationId) {
     if (USE_MOCK) return window.MockDB.getLocation(locationId);
     if (!sb) return null;
+    // select("*") namesto naštevanja stolpcev: deluje tudi, če stolpec 'lang'
+    // (še) ne obstaja – takrat se jezik privzeto nastavi na 'sl'.
     const { data, error } = await sb
       .from("locations")
-      .select("id, name, google_review_url, lang")
+      .select("*")
       .eq("id", locationId)
       .maybeSingle();
     if (error) {
