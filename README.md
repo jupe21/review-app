@@ -13,10 +13,12 @@ Preprosta review board aplikacija za zbiranje mnenj strank.
 
 ```
 index.html          # review stran
-dashboard.html      # dashboard
+dashboard.html      # dashboard (lastnik – svoje lokacije)
+admin.html          # admin board (skrbnik – vse lokacije)
 style.css           # skupni stili
 review.js           # logika review strani
 dashboard.js        # logika dashboarda
+admin.js            # logika admin boarda
 config.js           # env variabile (GENERIRANO na buildu)
 config.example.js   # primer konfiguracije
 mock-data.js        # dummy podatki za lokalni test
@@ -199,6 +201,39 @@ Dashboard prikazuje (zadnjih 30 dni):
 - **Razporeditev ocen** (1–5).
 - **Pregled po lokacijah**.
 - **Seznam slabih mnenj** s filtri (Vsa / Neprebrana / 1–2★ / 3★). Klik na mnenje ga označi kot prebrano (`read_at`).
+
+---
+
+## 7. Admin board (za tebe / skrbnika aplikacije)
+
+`/admin` je ločena stran s **polnim dostopom**: dodajanje/urejanje/brisanje **vseh** lokacij in vpogled v **vsa** mnenja. Namenjena je skrbniku aplikacije, ne lastnikom posameznih lokacij.
+
+Razlika med stranema:
+
+| Stran | Kdo | Kaj vidi |
+| ----- | --- | -------- |
+| `/dashboard` | lastnik lokacije | samo **svoje** lokacije (po `owner_email`) |
+| `/admin` | skrbnik (v tabeli `admins`) | **vse** lokacije + dodajanje/urejanje |
+
+### a) Določi, kdo je admin
+
+Admin je vsak prijavljen uporabnik, čigar e-pošta je v tabeli `admins`. Dodaj sebe (v Supabase **SQL Editor**):
+
+```sql
+insert into admins (email) values ('tvoja-prijavna@eposta.si');
+```
+
+> E-pošta mora biti enaka tisti, s katero se prijaviš (Supabase Auth račun iz koraka 6). Admin pravice uveljavlja baza (RLS prek funkcije `is_admin()`), ne frontend.
+
+### b) Uporaba
+
+- Odpri `https://tvoja-domena.com/admin` in se prijavi (isti Auth račun).
+- **Dodaj lokacijo**: vpiši `ID`, ime, Google Review URL in (neobvezno) `owner_email` lastnika. Klik **Shrani lokacijo**.
+  - Če vpišeš obstoječ `ID`, se lokacija **posodobi** (ali klikni **Uredi** v tabeli).
+  - S tem ko nastaviš `owner_email`, ta lastnik to lokacijo vidi v svojem `/dashboard`.
+- **Vse lokacije**: tabela z lastnikom, številom mnenj in povprečjem; gumba **Uredi** / **Izbriši**.
+
+> Če stran pokaže »Ta račun nima admin pravic«, te še ni v tabeli `admins` (glej korak a).
 
 ---
 

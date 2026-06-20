@@ -482,6 +482,88 @@ table.locations td.num {
   font-size: 0.95rem;
 }
 
+/* ============================================================
+   ADMIN – obrazec za lokacije
+   ============================================================ */
+.loc-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.loc-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.loc-form label .muted {
+  font-weight: 400;
+}
+.loc-form input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 11px 12px;
+  font-size: 0.98rem;
+  font-family: inherit;
+  color: var(--text);
+}
+.loc-form input:focus {
+  outline: none;
+  border-color: var(--green);
+}
+.loc-form input:disabled {
+  background: var(--bg-soft);
+  color: var(--text-muted);
+}
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.form-actions .btn {
+  width: auto;
+  padding: 12px 22px;
+}
+.form-actions .btn-link {
+  width: auto;
+  margin-top: 0;
+  padding: 12px 8px;
+}
+.form-msg {
+  margin: 2px 0;
+  font-size: 0.9rem;
+  min-height: 1.1em;
+  color: var(--text-muted);
+}
+.form-msg.ok {
+  color: var(--green-dark);
+}
+.form-msg.err {
+  color: var(--danger);
+}
+
+/* gumbi v vrstici tabele */
+.row-btn {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 5px 10px;
+  font-size: 0.84rem;
+  color: var(--text);
+}
+.row-btn:hover {
+  background: #eceef1;
+}
+.row-btn.danger {
+  color: var(--danger);
+  border-color: #f1c9c9;
+}
+.row-btn.danger:hover {
+  background: #fbeaea;
+}
+
 /* login zaslon */
 .login-overlay {
   min-height: 100vh;

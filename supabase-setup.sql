@@ -102,6 +102,51 @@ create policy "owner read locations"
   using (owner_email = (select auth.jwt() ->> 'email'));
 
 -- ------------------------------------------------------------
+-- Admin dostop (admin board) – poln dostop do vseh lokacij in mnenj
+-- ------------------------------------------------------------
+
+-- Seznam admin e-poštnih naslovov (kdo ima poln dostop do aplikacije).
+create table if not exists admins (
+  email text primary key
+);
+alter table admins enable row level security;
+-- Namerno BREZ politik: tabela ni dosegljiva prek javnega API-ja.
+-- Bere jo le funkcija is_admin() (security definer) oz. service_role / SQL editor.
+
+-- Pomožna funkcija: ali je prijavljeni uporabnik admin?
+-- security definer => obide RLS na tabeli admins (sicer bi preverjanje vrnilo prazno).
+create or replace function public.is_admin()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1 from admins
+    where email = (select auth.jwt() ->> 'email')
+  );
+$$;
+
+-- locations: admin ima POLN dostop (dodaja/ureja/briše + bere vse).
+drop policy if exists "admin all locations" on locations;
+create policy "admin all locations"
+  on locations for all
+  to authenticated
+  using (is_admin())
+  with check (is_admin());
+
+-- reviews: admin lahko bere VSA mnenja (vse lokacije).
+drop policy if exists "admin read reviews" on reviews;
+create policy "admin read reviews"
+  on reviews for select
+  to authenticated
+  using (is_admin());
+
+-- ⬇️ DODAJ SEBE KOT ADMINA (zamenjaj z e-pošto svojega prijavnega računa):
+-- insert into admins (email) values ('admin@primer.si');
+
+-- ------------------------------------------------------------
 -- Primer lokacije (po želji odkomentiraj in prilagodi)
 -- ------------------------------------------------------------
 -- insert into locations (id, name, google_review_url, owner_email) values

@@ -96,6 +96,30 @@
       return Object.values(locations);
     },
 
+    // --- admin board ---
+    async isAdmin() {
+      await new Promise((res) => setTimeout(res, 50));
+      return true; // v mock načinu je vse dovoljeno (lokalni razvoj)
+    },
+
+    async upsertLocation(loc) {
+      await new Promise((res) => setTimeout(res, 150));
+      locations[loc.id] = {
+        id: loc.id,
+        name: loc.name,
+        google_review_url: loc.google_review_url,
+        owner_email: loc.owner_email || null,
+      };
+      console.log("[MOCK] shranjena lokacija:", locations[loc.id]);
+      return locations[loc.id];
+    },
+
+    async deleteLocation(id) {
+      await new Promise((res) => setTimeout(res, 100));
+      delete locations[id];
+      console.log("[MOCK] izbrisana lokacija:", id);
+    },
+
     async markRead(reviewId) {
       await new Promise((res) => setTimeout(res, 100));
       const row = reviews.find((r) => r.id === reviewId);
