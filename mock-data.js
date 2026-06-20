@@ -15,18 +15,21 @@
       name: "Testna lokacija",
       google_review_url: "https://www.google.com/search?q=google+reviews",
       owner_email: "test@primer.si",
+      lang: "sl",
     },
     ABC123: {
       id: "ABC123",
       name: "Kavarna Center",
       google_review_url: "https://www.google.com/search?q=kavarna+center",
       owner_email: "lastnik@primer.si",
+      lang: "sl",
     },
     XYZ789: {
       id: "XYZ789",
       name: "Restavracija Pri Lipi",
       google_review_url: "https://www.google.com/search?q=pri+lipi",
       owner_email: "lastnik2@primer.si",
+      lang: "en",
     },
   };
 
@@ -109,6 +112,7 @@
         name: loc.name,
         google_review_url: loc.google_review_url,
         owner_email: loc.owner_email || null,
+        lang: loc.lang || "sl",
       };
       console.log("[MOCK] shranjena lokacija:", locations[loc.id]);
       return locations[loc.id];

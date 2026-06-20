@@ -6,6 +6,72 @@
   const cfg = window.APP_CONFIG || {};
   const USE_MOCK = !!cfg.USE_MOCK;
 
+  // --- i18n -----------------------------------------------------------------
+  const I18N = {
+    sl: {
+      page_title: "Vaše mnenje",
+      rate_title: "Kako zadovoljni ste bili?",
+      rate_subtitle: "Vaše mnenje nam veliko pomeni.",
+      next: "Naprej",
+      next_google: "Naprej na Google",
+      hint5: "Super! Kliknite za oddajo ocene na Googlu.",
+      four_title: "Hvala za oceno!",
+      four_subtitle: "Bi nam pomagali z oceno tudi na Googlu? Traja le trenutek.",
+      open_google: "Odpri Google recenzije",
+      no_thanks: "Raje ne, hvala",
+      feedback_title: "Žal nam je.",
+      feedback_subtitle: "Povejte nam, kaj je šlo narobe — popravili bomo.",
+      feedback_placeholder: "Opišite vašo izkušnjo...",
+      send: "Pošlji",
+      feedback_thanks_title: "Hvala za sporočilo",
+      feedback_thanks_subtitle: "Upoštevali bomo vaše mnenje.",
+      rating_thanks_title: "Hvala za vašo oceno!",
+      rating_thanks_subtitle: "Cenimo, da ste si vzeli čas.",
+      error_title: "Lokacija ni najdena",
+      error_missing: "Manjka oznaka lokacije v povezavi. Prosimo, ponovno skenirajte kodo.",
+      error_notfound: "Te lokacije ne najdemo. Prosimo, ponovno skenirajte kodo.",
+    },
+    en: {
+      page_title: "Your feedback",
+      rate_title: "How satisfied were you?",
+      rate_subtitle: "Your feedback means a lot to us.",
+      next: "Next",
+      next_google: "Continue to Google",
+      hint5: "Great! Tap to leave your review on Google.",
+      four_title: "Thanks for your rating!",
+      four_subtitle: "Would you help us with a Google review too? It only takes a moment.",
+      open_google: "Open Google reviews",
+      no_thanks: "No thanks",
+      feedback_title: "We're sorry.",
+      feedback_subtitle: "Tell us what went wrong — we'll make it right.",
+      feedback_placeholder: "Describe your experience...",
+      send: "Send",
+      feedback_thanks_title: "Thank you for your message",
+      feedback_thanks_subtitle: "We'll take your feedback into account.",
+      rating_thanks_title: "Thank you for your rating!",
+      rating_thanks_subtitle: "We appreciate you taking the time.",
+      error_title: "Location not found",
+      error_missing: "The location code is missing from the link. Please scan the code again.",
+      error_notfound: "We couldn't find this location. Please scan the code again.",
+    },
+  };
+
+  let lang = "sl";
+  function t(key) {
+    return (I18N[lang] && I18N[lang][key]) || I18N.sl[key] || key;
+  }
+  function setLang(l) {
+    lang = I18N[l] ? l : "sl";
+    document.documentElement.lang = lang;
+    document.title = t("page_title");
+    document.querySelectorAll("[data-i18n]").forEach((el) => {
+      el.textContent = t(el.dataset.i18n);
+    });
+    document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+      el.setAttribute("placeholder", t(el.dataset.i18nPlaceholder));
+    });
+  }
+
   // --- Supabase client (samo kadar ni mock) ---------------------------------
   let sb = null;
   if (!USE_MOCK) {
@@ -22,7 +88,7 @@
     if (!sb) return null;
     const { data, error } = await sb
       .from("locations")
-      .select("id, name, google_review_url")
+      .select("id, name, google_review_url, lang")
       .eq("id", locationId)
       .maybeSingle();
     if (error) {
@@ -65,12 +131,6 @@
   };
 
   // --- pomožne --------------------------------------------------------------
-  function getLoc() {
-    const params = new URLSearchParams(window.location.search);
-    const loc = (params.get("loc") || "").trim();
-    return loc;
-  }
-
   function showStep(id) {
     document.querySelectorAll(".step").forEach((s) => s.classList.remove("active"));
     document.getElementById(id).classList.add("active");
@@ -88,12 +148,12 @@
     paintStars(r);
 
     if (r === 5) {
-      btnNext.textContent = "Naprej na Google";
+      btnNext.textContent = t("next_google");
       btnNext.classList.add("btn-google");
-      hintEl.textContent = "Super! Kliknite za oddajo ocene na Googlu.";
+      hintEl.textContent = t("hint5");
       hintEl.classList.add("show");
     } else {
-      btnNext.textContent = "Naprej";
+      btnNext.textContent = t("next");
       btnNext.classList.remove("btn-google");
       hintEl.textContent = "";
       hintEl.classList.remove("show");
@@ -107,7 +167,7 @@
       window.location.href = url;
     } else {
       // brez URL-ja vsaj prikaži zahvalo
-      showThanks("Hvala za vašo oceno!", "Cenimo, da ste si vzeli čas.");
+      showThanks(t("rating_thanks_title"), t("rating_thanks_subtitle"));
     }
   }
 
@@ -180,7 +240,7 @@
   btnFourNo.addEventListener("click", async () => {
     lockButtons(true);
     await saveOnce(4, null, false);
-    showThanks("Hvala za vašo oceno!", "Cenimo, da ste si vzeli čas.");
+    showThanks(t("rating_thanks_title"), t("rating_thanks_subtitle"));
   });
 
   // 1–3 zvezde – pošlji feedback
@@ -188,14 +248,19 @@
     lockButtons(true);
     const comment = feedbackText.value.trim();
     await saveOnce(state.rating, comment, false);
-    showThanks("Hvala za sporočilo", "Upoštevali bomo vaše mnenje.");
+    showThanks(t("feedback_thanks_title"), t("feedback_thanks_subtitle"));
   });
 
   // --- init -----------------------------------------------------------------
   async function init() {
-    const loc = getLoc();
+    const params = new URLSearchParams(window.location.search);
+    const urlLang = (params.get("lang") || "").trim().toLowerCase();
+    // Jezik iz URL-ja (npr. ?lang=en) takoj uveljavi – brez utripa.
+    if (urlLang) setLang(urlLang);
+
+    const loc = (params.get("loc") || "").trim();
     if (!loc) {
-      errorText.textContent = "Manjka oznaka lokacije v povezavi. Prosimo, ponovno skenirajte kodo.";
+      errorText.textContent = t("error_missing");
       showStep("step-error");
       return;
     }
@@ -203,11 +268,14 @@
 
     const location = await getLocation(loc);
     if (!location) {
-      errorText.textContent = "Te lokacije ne najdemo. Prosimo, ponovno skenirajte kodo.";
+      errorText.textContent = t("error_notfound");
       showStep("step-error");
       return;
     }
     state.location = location;
+
+    // Jezik lokacije (če ni že nastavljen prek URL-ja).
+    if (!urlLang) setLang(location.lang || "sl");
     // korak za oceno je že privzeto aktiven
   }
 

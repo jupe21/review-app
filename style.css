@@ -387,6 +387,7 @@ table.locations th {
 table.locations tr:last-child td {
   border-bottom: none;
 }
+table.locations th.num,
 table.locations td.num {
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -481,6 +482,17 @@ table.locations td.num {
   padding: 2px 8px;
   border-radius: 999px;
 }
+.lang-tag {
+  display: inline-block;
+  background: var(--bg-soft);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  vertical-align: middle;
+}
 
 /* prazno stanje / nalaganje */
 .empty {
@@ -508,7 +520,8 @@ table.locations td.num {
 .loc-form label .muted {
   font-weight: 400;
 }
-.loc-form input {
+.loc-form input,
+.loc-form select {
   width: 100%;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -516,8 +529,10 @@ table.locations td.num {
   font-size: 0.98rem;
   font-family: inherit;
   color: var(--text);
+  background: var(--bg);
 }
-.loc-form input:focus {
+.loc-form input:focus,
+.loc-form select:focus {
   outline: none;
   border-color: var(--green);
 }

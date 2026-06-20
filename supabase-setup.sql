@@ -29,8 +29,12 @@ create table if not exists locations (
   id                text primary key,
   name              text not null,
   google_review_url text not null,
-  owner_email       text
+  owner_email       text,
+  lang              text not null default 'sl'   -- jezik review strani: 'sl' ali 'en'
 );
+
+-- Za obstoječe baze (če tabela že obstaja brez stolpca lang):
+alter table locations add column if not exists lang text not null default 'sl';
 
 -- ------------------------------------------------------------
 -- Row Level Security (RLS)

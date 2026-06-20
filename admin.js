@@ -87,6 +87,7 @@
   const fName = document.getElementById("f-name");
   const fUrl = document.getElementById("f-url");
   const fOwner = document.getElementById("f-owner");
+  const fLang = document.getElementById("f-lang");
   const formMsg = document.getElementById("form-msg");
   const saveBtn = document.getElementById("save-btn");
   const resetBtn = document.getElementById("reset-btn");
@@ -163,7 +164,8 @@
         const data = encodeURIComponent(JSON.stringify(l));
         return (
           "<tr>" +
-          "<td>" + escapeHtml(l.name) + "</td>" +
+          "<td>" + escapeHtml(l.name) +
+          ' <span class="lang-tag">' + (l.lang === "en" ? "EN" : "SL") + "</span></td>" +
           "<td><code>" + escapeHtml(l.id) + "</code></td>" +
           "<td>" + escapeHtml(l.owner_email || "–") + "</td>" +
           '<td class="num">' + s.count + "</td>" +
@@ -253,6 +255,7 @@
     fName.value = loc.name || "";
     fUrl.value = loc.google_review_url || "";
     fOwner.value = loc.owner_email || "";
+    fLang.value = loc.lang || "sl";
     formTitle.textContent = "Uredi lokacijo: " + loc.id;
     formMsg.textContent = "";
     formMsg.className = "form-msg";
@@ -266,6 +269,7 @@
       name: fName.value.trim(),
       google_review_url: fUrl.value.trim(),
       owner_email: fOwner.value.trim() || null,
+      lang: fLang.value || "sl",
     };
     if (!loc.id || !loc.name || !loc.google_review_url) return;
 
