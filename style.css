@@ -473,6 +473,14 @@ table.locations td.num {
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
+.badge-google {
+  background: var(--blue);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
 
 /* prazno stanje / nalaganje */
 .empty {

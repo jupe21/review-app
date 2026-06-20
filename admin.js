@@ -43,7 +43,10 @@
   async function getAllReviews() {
     if (USE_MOCK) return window.MockDB.getReviews({});
     if (!sb) return [];
-    const { data, error } = await sb.from("reviews").select("location_id, rating");
+    const { data, error } = await sb
+      .from("reviews")
+      .select("*")
+      .order("created_at", { ascending: false });
     if (error) {
       console.error("Napaka pri branju mnenj:", error);
       return [];
@@ -102,10 +105,43 @@
     return avg ? avg.toFixed(1) : "–";
   }
 
-  // --- render lokacij -------------------------------------------------------
+  function starString(rating) {
+    const r = Math.round(rating);
+    return "★★★★★".slice(0, r) + "☆☆☆☆☆".slice(0, 5 - r);
+  }
+
+  function locName(id) {
+    return locationNames[id] || id;
+  }
+
+  function formatTime(iso) {
+    const d = new Date(iso);
+    const min = Math.floor((Date.now() - d) / 60000);
+    if (min < 1) return "pravkar";
+    if (min < 60) return "pred " + min + " min";
+    const hrs = Math.floor(min / 60);
+    if (hrs < 24) return "pred " + hrs + " h";
+    const days = Math.floor(hrs / 24);
+    if (days < 7) return "pred " + days + (days === 1 ? " dnem" : " dnevi");
+    return d.toLocaleDateString("sl-SI", { day: "numeric", month: "short", year: "numeric" });
+  }
+
+  // --- stanje ---------------------------------------------------------------
+  let allReviews = [];
+  let locationNames = {};
+  let reviewFilter = "all";
+
+  // --- render: vse skupaj ---------------------------------------------------
   async function loadLocations() {
     locBody.innerHTML = '<tr><td colspan="6"><div class="empty">Nalaganje…</div></td></tr>';
     const [locations, reviews] = await Promise.all([getAllLocations(), getAllReviews()]);
+
+    allReviews = reviews;
+    locationNames = {};
+    locations.forEach((l) => (locationNames[l.id] = l.name));
+
+    renderMetrics();
+    renderReviews();
 
     const stats = {};
     reviews.forEach((r) => {
@@ -141,6 +177,66 @@
       })
       .join("");
   }
+
+  // --- render: metrike ------------------------------------------------------
+  function renderMetrics() {
+    const total = allReviews.length;
+    const avg = total ? allReviews.reduce((s, r) => s + r.rating, 0) / total : 0;
+    const google = allReviews.filter((r) => r.went_to_google).length;
+    const googlePct = total ? Math.round((google / total) * 100) : 0;
+    const bad = allReviews.filter((r) => r.rating <= 3);
+    const unread = bad.filter((r) => !r.read_at).length;
+
+    document.getElementById("m-total").textContent = total;
+    document.getElementById("m-avg").innerHTML = total
+      ? avg.toFixed(1) + ' <small>/ 5</small>'
+      : "–";
+    document.getElementById("m-google").textContent = google;
+    document.getElementById("m-google-sub").textContent = total ? googlePct + " % vseh" : " ";
+    document.getElementById("m-bad").textContent = bad.length;
+    document.getElementById("m-bad-sub").textContent =
+      unread > 0 ? unread + " neprebranih" : "vse prebrano";
+  }
+
+  // --- render: vsa mnenja ---------------------------------------------------
+  function renderReviews() {
+    let list = allReviews.slice();
+    if (reviewFilter === "bad") list = list.filter((r) => r.rating <= 3);
+    else if (reviewFilter === "good") list = list.filter((r) => r.rating >= 4);
+
+    document.getElementById("rev-count").textContent = "(" + list.length + ")";
+    const el = document.getElementById("rev-list");
+    if (list.length === 0) {
+      el.innerHTML = '<div class="empty">Ni mnenj za ta filter.</div>';
+      return;
+    }
+    el.innerHTML = list
+      .map(
+        (r) =>
+          '<div class="review-item" style="cursor:default">' +
+          '<div class="top">' +
+          '<span class="ri-stars">' + starString(r.rating) + "</span>" +
+          '<span class="ri-loc">' + escapeHtml(locName(r.location_id)) + "</span>" +
+          (r.went_to_google ? '<span class="badge-google">Google</span>' : "") +
+          '<span class="ri-time">' + formatTime(r.created_at) + "</span>" +
+          "</div>" +
+          '<div class="ri-comment">' +
+          (r.comment ? escapeHtml(r.comment) : "<em>(brez komentarja)</em>") +
+          "</div>" +
+          "</div>"
+      )
+      .join("");
+  }
+
+  // filter chipi za mnenja
+  document.getElementById("rev-chips").addEventListener("click", (e) => {
+    const chip = e.target.closest(".chip");
+    if (!chip) return;
+    reviewFilter = chip.dataset.filter;
+    document.querySelectorAll("#rev-chips .chip").forEach((c) => c.classList.remove("active"));
+    chip.classList.add("active");
+    renderReviews();
+  });
 
   // --- obrazec --------------------------------------------------------------
   function resetForm() {
