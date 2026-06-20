@@ -90,6 +90,7 @@ alter table locations enable row level security;
 
 drop policy if exists "read locations anon" on locations;   -- stara imena
 drop policy if exists "read locations" on locations;
+drop policy if exists "anon read locations" on locations;
 create policy "anon read locations"
   on locations for select
   to anon
