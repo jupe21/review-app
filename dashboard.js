@@ -171,7 +171,7 @@
 
     const body = document.getElementById("loc-body");
     if (rows.length === 0) {
-      body.innerHTML = '<tr><td colspan="4"><div class="empty">Ni podatkov.</div></td></tr>';
+      body.innerHTML = '<tr><td colspan="5"><div class="empty">Ni podatkov.</div></td></tr>';
       return;
     }
     body.innerHTML = rows
@@ -182,6 +182,8 @@
           '<td class="num">' + r.avg.toFixed(1) + "</td>" +
           '<td class="num">' + r.count + "</td>" +
           '<td style="color:var(--star-on)">' + starString(r.avg) + "</td>" +
+          '<td class="num"><button class="row-btn" data-qr="' + escapeHtml(r.id) +
+          '" data-qr-name="' + escapeHtml(r.name) + '">QR</button></td>' +
           "</tr>"
       )
       .join("");
@@ -239,6 +241,12 @@
   }
 
   // --- interakcije ----------------------------------------------------------
+  // QR koda za lokacijo
+  document.getElementById("loc-body").addEventListener("click", (e) => {
+    const qrBtn = e.target.closest("[data-qr]");
+    if (qrBtn && window.QR) window.QR.open(qrBtn.dataset.qr, qrBtn.dataset.qrName);
+  });
+
   // filter chipi
   document.getElementById("chips").addEventListener("click", (e) => {
     const chip = e.target.closest(".chip");

@@ -171,6 +171,8 @@
           '<td class="num">' + s.count + "</td>" +
           '<td class="num">' + starAvg(avg) + "</td>" +
           '<td class="num" style="white-space:nowrap">' +
+          '<button class="row-btn" data-qr="' + escapeHtml(l.id) +
+          '" data-qr-name="' + escapeHtml(l.name) + '">QR</button> ' +
           '<button class="row-btn" data-edit="' + data + '">Uredi</button> ' +
           '<button class="row-btn danger" data-del="' + escapeHtml(l.id) + '">Izbriši</button>' +
           "</td>" +
@@ -293,6 +295,11 @@
 
   // klik v tabeli (uredi / izbriši)
   locBody.addEventListener("click", async (e) => {
+    const qrBtn = e.target.closest("[data-qr]");
+    if (qrBtn) {
+      if (window.QR) window.QR.open(qrBtn.dataset.qr, qrBtn.dataset.qrName);
+      return;
+    }
     const editBtn = e.target.closest("[data-edit]");
     if (editBtn) {
       try {

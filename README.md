@@ -21,6 +21,7 @@ landing.js          # logika landing strani (kontaktni obrazec)
 review.js           # logika review strani
 dashboard.js        # logika dashboarda
 admin.js            # logika admin boarda
+qr.js               # generiranje QR kod (admin + dashboard)
 public/             # logotipi, favicon, hero video in poster
 config.js           # env variabile (GENERIRANO na buildu)
 config.example.js   # primer konfiguracije
@@ -117,14 +118,19 @@ Na goli domeni (`https://tvoja-domena.com`) je **landing stran**. Review stran s
 https://tvoja-domena.com/?loc=ABC123
 ```
 
-Ta se samodejno preusmeri na `/review?loc=ABC123`, zato stare QR kode delujejo naprej. Nove lahko delaš tudi neposredno na `/review?loc=ABC123`.
+Ta se samodejno preusmeri na `/review?loc=ABC123`, zato stare QR kode delujejo naprej.
 
-QR kodo iz te povezave ustvariš s katerim koli generatorjem, npr.:
+### Najlažje: kar v aplikaciji
 
-- <https://www.qr-code-generator.com>
-- ali CLI: `npx qrcode "https://tvoja-domena.com/?loc=ABC123" -o abc123.png`
+V **admin boardu** (in tudi v dashboardu) ima vsaka lokacija gumb **QR**. Ob kliku se odpre brendirana QR koda (generira se v brskalniku, brez zunanjega servisa) z gumbi:
 
-Natisni QR kodo ali nalepko in jo postavi na mizo, blagajno ali pošlji prek NFC nalepke.
+- **Prenesi PNG** (visoka ločljivost za tisk),
+- **Prenesi SVG** (vektorsko, ostro pri vsaki velikosti),
+- **Natisni nalepko** (pripravljena kartica z imenom lokacije in pozivom "Skenirajte in nas ocenite").
+
+QR kodira `…/review?loc=ID`. Natisni in postavi na mizo, blagajno ali pošlji prek NFC nalepke.
+
+> Alternativno (ročno) lahko QR ustvariš tudi z zunanjim generatorjem (npr. <https://www.qr-code-generator.com>) iz povezave `https://tvoja-domena.com/?loc=ABC123`.
 
 ---
 
