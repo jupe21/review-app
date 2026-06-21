@@ -17,9 +17,11 @@ review.html         # review stran (/review, odpre se prek QR /?loc=ID)
 dashboard.html      # dashboard (lastnik, svoje lokacije)
 admin.html          # admin board (skrbnik, vse lokacije)
 style.css           # skupni stili
+landing.js          # logika landing strani (kontaktni obrazec)
 review.js           # logika review strani
 dashboard.js        # logika dashboarda
 admin.js            # logika admin boarda
+public/             # logotipi, favicon, hero video in poster
 config.js           # env variabile (GENERIRANO na buildu)
 config.example.js   # primer konfiguracije
 mock-data.js        # dummy podatki za lokalni test
@@ -52,6 +54,14 @@ npx serve .
 > Opomba: stran odpri prek strežnika (`http://…`), **ne** kot `file://`, sicer brskalnik ne naloži skript pravilno.
 
 Za povezavo s pravim Supabase nastavi `USE_MOCK: false` in vpiši ključe v `config.js` (glej `config.example.js`).
+
+### Landing in kontaktni obrazec
+
+Landing stran (`index.html`) uporablja temno temo, video hero iz `public/` in kontaktni obrazec. Privzeto obrazec ob oddaji odpre e-poštni odjemalec (mailto na `info@n3x7.si`).
+
+Za pravo oddajo brez odpiranja e-pošte v `landing.js` nastavi `CONTACT_ENDPOINT` na URL n8n webhooka ali Formspree obrazca. Obrazec pošlje JSON `{ name, email, message }`.
+
+> Velika izvorna slika `public/hero.png` (14 MB) ni v gitu (glej `.gitignore`); uporabljamo `public/hero-poster.jpg` in video `hero.webm` / `hero.mp4`.
 
 ---
 
