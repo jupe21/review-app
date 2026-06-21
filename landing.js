@@ -3,6 +3,23 @@
 (function () {
   "use strict";
 
+  // --- 5-zvezdic animacija (Lottie) -----------------------------------------
+  // Ob nalaganju se zažene enkrat in obstane na zadnjem frame-u (5 zvezdic).
+  // Ob vsakem hoverju se znova zažene od začetka do 5 zvezdic.
+  var starsEl = document.getElementById("lp-stars");
+  if (starsEl && window.lottie) {
+    var starsAnim = window.lottie.loadAnimation({
+      container: starsEl,
+      renderer: "svg",
+      loop: false,
+      autoplay: true,
+      path: "public/5-stars.json",
+    });
+    starsEl.addEventListener("mouseenter", function () {
+      starsAnim.goToAndPlay(0, true);
+    });
+  }
+
   // Kam naj gre oddaja obrazca.
   // Pusti prazno za mailto (odpre e-poštni odjemalec), ali vpiši URL n8n
   // webhooka oz. Formspree obrazca za pravo oddajo brez odpiranja e-pošte.
