@@ -72,6 +72,11 @@
     });
   }
 
+  // --- tema -----------------------------------------------------------------
+  function setTheme(theme) {
+    document.documentElement.setAttribute("data-theme", theme || "classic");
+  }
+
   // --- Supabase client (samo kadar ni mock) ---------------------------------
   let sb = null;
   if (!USE_MOCK) {
@@ -260,6 +265,9 @@
     // Jezik iz URL-ja (npr. ?lang=en) takoj uveljavi – brez utripa.
     if (urlLang) setLang(urlLang);
 
+    const urlTheme = (params.get("theme") || "").trim().toLowerCase();
+    if (urlTheme) setTheme(urlTheme);
+
     const loc = (params.get("loc") || "").trim();
     if (!loc) {
       errorText.textContent = t("error_missing");
@@ -276,8 +284,9 @@
     }
     state.location = location;
 
-    // Jezik lokacije (če ni že nastavljen prek URL-ja).
+    // Jezik in tema lokacije (če nista že nastavljena prek URL-ja).
     if (!urlLang) setLang(location.lang || "sl");
+    if (!urlTheme) setTheme(location.theme || "classic");
     // korak za oceno je že privzeto aktiven
   }
 

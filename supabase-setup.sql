@@ -30,11 +30,13 @@ create table if not exists locations (
   name              text not null,
   google_review_url text not null,
   owner_email       text,
-  lang              text not null default 'sl'   -- jezik review strani: 'sl' ali 'en'
+  lang              text not null default 'sl',        -- jezik review strani: 'sl' ali 'en'
+  theme             text not null default 'classic'    -- videz review strani (glej style.css)
 );
 
--- Za obstoječe baze (če tabela že obstaja brez stolpca lang):
-alter table locations add column if not exists lang text not null default 'sl';
+-- Za obstoječe baze (če stolpca še ne obstajata):
+alter table locations add column if not exists lang  text not null default 'sl';
+alter table locations add column if not exists theme text not null default 'classic';
 
 -- ------------------------------------------------------------
 -- Row Level Security (RLS)
@@ -105,6 +107,15 @@ create policy "owner read locations"
   on locations for select
   to authenticated
   using (owner_email = (select auth.jwt() ->> 'email'));
+
+-- lastnik lahko ureja SVOJE lokacije (npr. temo iz dashboarda).
+-- with check prepreči, da bi owner_email spremenil na tujega.
+drop policy if exists "owner update locations" on locations;
+create policy "owner update locations"
+  on locations for update
+  to authenticated
+  using (owner_email = (select auth.jwt() ->> 'email'))
+  with check (owner_email = (select auth.jwt() ->> 'email'));
 
 -- ------------------------------------------------------------
 -- Admin dostop (admin board) – poln dostop do vseh lokacij in mnenj

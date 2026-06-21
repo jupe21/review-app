@@ -16,6 +16,7 @@
       google_review_url: "https://www.google.com/search?q=google+reviews",
       owner_email: "test@primer.si",
       lang: "sl",
+      theme: "classic",
     },
     ABC123: {
       id: "ABC123",
@@ -23,6 +24,7 @@
       google_review_url: "https://www.google.com/search?q=kavarna+center",
       owner_email: "lastnik@primer.si",
       lang: "sl",
+      theme: "ocean",
     },
     XYZ789: {
       id: "XYZ789",
@@ -30,6 +32,7 @@
       google_review_url: "https://www.google.com/search?q=pri+lipi",
       owner_email: "lastnik2@primer.si",
       lang: "en",
+      theme: "indigo",
     },
   };
 
@@ -113,9 +116,18 @@
         google_review_url: loc.google_review_url,
         owner_email: loc.owner_email || null,
         lang: loc.lang || "sl",
+        theme: loc.theme || "classic",
       };
       console.log("[MOCK] shranjena lokacija:", locations[loc.id]);
       return locations[loc.id];
+    },
+
+    async updateTheme(id, theme) {
+      await new Promise((res) => setTimeout(res, 100));
+      if (locations[id]) {
+        locations[id].theme = theme;
+        console.log("[MOCK] tema posodobljena:", id, theme);
+      }
     },
 
     async deleteLocation(id) {

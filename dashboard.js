@@ -45,12 +45,19 @@
   async function getLocations() {
     if (USE_MOCK) return window.MockDB.getLocations();
     if (!sb) return [];
-    const { data, error } = await sb.from("locations").select("id, name");
+    const { data, error } = await sb.from("locations").select("id, name, theme");
     if (error) {
       console.error("Napaka pri branju lokacij:", error);
       return [];
     }
     return data || [];
+  }
+
+  async function updateTheme(id, theme) {
+    if (USE_MOCK) return window.MockDB.updateTheme(id, theme);
+    if (!sb) return;
+    const { error } = await sb.from("locations").update({ theme: theme }).eq("id", id);
+    if (error) console.error("Napaka pri shranjevanju teme:", error);
   }
 
   async function markRead(reviewId) {
@@ -77,6 +84,7 @@
 
   // --- stanje ---------------------------------------------------------------
   let allReviews = [];
+  let allLocations = []; // [{id, name, theme}]
   let locationNames = {}; // id -> name
   let currentFilter = "all";
 
@@ -160,28 +168,37 @@
       groups[r.location_id].count++;
     });
 
-    const rows = Object.keys(groups)
-      .map((id) => ({
-        id,
-        name: locName(id),
-        avg: groups[id].sum / groups[id].count,
-        count: groups[id].count,
-      }))
+    // Pokaži VSE lastnikove lokacije (tudi tiste brez mnenj), da lahko ureja temo.
+    const rows = allLocations
+      .map((l) => {
+        const g = groups[l.id] || { sum: 0, count: 0 };
+        return {
+          id: l.id,
+          name: l.name,
+          theme: l.theme || "classic",
+          avg: g.count ? g.sum / g.count : 0,
+          count: g.count,
+        };
+      })
       .sort((a, b) => b.count - a.count);
 
     const body = document.getElementById("loc-body");
     if (rows.length === 0) {
-      body.innerHTML = '<tr><td colspan="5"><div class="empty">Ni podatkov.</div></td></tr>';
+      body.innerHTML = '<tr><td colspan="6"><div class="empty">Ni lokacij.</div></td></tr>';
       return;
     }
+    const themeOpts = window.buildThemeOptions;
     body.innerHTML = rows
       .map(
         (r) =>
           "<tr>" +
           "<td>" + escapeHtml(r.name) + "</td>" +
-          '<td class="num">' + r.avg.toFixed(1) + "</td>" +
+          '<td class="num">' + (r.count ? r.avg.toFixed(1) : "–") + "</td>" +
           '<td class="num">' + r.count + "</td>" +
-          '<td style="color:var(--star-on)">' + starString(r.avg) + "</td>" +
+          '<td style="color:var(--star-on)">' + (r.count ? starString(r.avg) : "") + "</td>" +
+          '<td><select class="row-select" data-theme-for="' + escapeHtml(r.id) + '">' +
+          (themeOpts ? themeOpts(r.theme) : "") +
+          "</select></td>" +
           '<td class="num"><button class="row-btn" data-qr="' + escapeHtml(r.id) +
           '" data-qr-name="' + escapeHtml(r.name) + '">QR</button></td>' +
           "</tr>"
@@ -247,6 +264,21 @@
     if (qrBtn && window.QR) window.QR.open(qrBtn.dataset.qr, qrBtn.dataset.qrName);
   });
 
+  // sprememba teme lokacije (shrani takoj)
+  document.getElementById("loc-body").addEventListener("change", async (e) => {
+    const sel = e.target.closest("[data-theme-for]");
+    if (!sel) return;
+    const id = sel.dataset.themeFor;
+    const theme = sel.value;
+    sel.disabled = true;
+    await updateTheme(id, theme);
+    const loc = allLocations.find((l) => l.id === id);
+    if (loc) loc.theme = theme;
+    sel.disabled = false;
+    sel.classList.add("saved");
+    setTimeout(() => sel.classList.remove("saved"), 1200);
+  });
+
   // filter chipi
   document.getElementById("chips").addEventListener("click", (e) => {
     const chip = e.target.closest(".chip");
@@ -281,6 +313,7 @@
     document.getElementById("period-note").textContent = "Zadnjih " + WINDOW_DAYS + " dni";
     const [reviews, locations] = await Promise.all([getReviews(), getLocations()]);
     allReviews = reviews;
+    allLocations = locations;
     locationNames = {};
     locations.forEach((l) => (locationNames[l.id] = l.name));
     renderAll();

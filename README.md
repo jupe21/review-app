@@ -22,6 +22,7 @@ review.js           # logika review strani
 dashboard.js        # logika dashboarda
 admin.js            # logika admin boarda
 qr.js               # generiranje QR kod (admin + dashboard)
+themes.js           # seznam tem review strani (admin + dashboard)
 public/             # logotipi, favicon, hero video in poster
 config.js           # env variabile (GENERIRANO na buildu)
 config.example.js   # primer konfiguracije
@@ -101,6 +102,8 @@ insert into locations (id, name, google_review_url, owner_email) values
 - `name` – prikazano ime na dashboardu.
 - `google_review_url` – kamor usmerimo zadovoljne stranke.
 - `owner_email` – ⚠️ **pomembno:** mora biti **enak e-pošti prijavnega računa** (Supabase Auth) lastnika te lokacije. Dashboard prikaže samo lokacije, kjer se `owner_email` ujema s prijavljenim uporabnikom. Če se ne ujema, lastnik te lokacije ne bo videl.
+- `lang` – jezik review strani (`sl` ali `en`).
+- `theme` – videz review strani (`classic`, `ocean`, `sunset`, `indigo`, `dark`). Urejaš ga v adminu ali v dashboardu. Za predogled lahko na review povezavo dodaš `&theme=ID`.
 
 ### Kako dobiti Google Review URL
 
@@ -220,7 +223,7 @@ Dashboard prikazuje (zadnjih 30 dni):
 
 - **Metrike**: skupaj mnenj, povprečna ocena, koliko jih je šlo na Google, število slabih mnenj (1–3★) in neprebranih.
 - **Razporeditev ocen** (1–5).
-- **Pregled po lokacijah**.
+- **Pregled po lokacijah** (z gumbom **QR** in izbirnikom **teme** za vsako lokacijo; sprememba teme se shrani takoj).
 - **Seznam slabih mnenj** s filtri (Vsa / Neprebrana / 1–2★ / 3★). Klik na mnenje ga označi kot prebrano (`read_at`).
 
 ---

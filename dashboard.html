@@ -80,7 +80,7 @@
       <!-- LOKACIJE -->
       <section class="section">
         <h2>Pregled po lokacijah</h2>
-        <div class="panel">
+        <div class="panel" style="overflow-x: auto">
           <table class="locations">
             <thead>
               <tr>
@@ -88,12 +88,13 @@
                 <th class="num">Povp. ocena</th>
                 <th class="num">Mnenj</th>
                 <th>Zvezde</th>
+                <th>Tema</th>
                 <th></th>
               </tr>
             </thead>
             <tbody id="loc-body">
               <tr>
-                <td colspan="5"><div class="empty">Nalaganje…</div></td>
+                <td colspan="6"><div class="empty">Nalaganje…</div></td>
               </tr>
             </tbody>
           </table>
@@ -119,6 +120,7 @@
     <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
     <script src="config.js"></script>
     <script src="mock-data.js"></script>
+    <script src="themes.js"></script>
     <script src="qr.js"></script>
     <script src="dashboard.js"></script>
   </body>

@@ -88,6 +88,8 @@
   const fUrl = document.getElementById("f-url");
   const fOwner = document.getElementById("f-owner");
   const fLang = document.getElementById("f-lang");
+  const fTheme = document.getElementById("f-theme");
+  if (fTheme && window.buildThemeOptions) fTheme.innerHTML = window.buildThemeOptions();
   const formMsg = document.getElementById("form-msg");
   const saveBtn = document.getElementById("save-btn");
   const resetBtn = document.getElementById("reset-btn");
@@ -258,6 +260,7 @@
     fUrl.value = loc.google_review_url || "";
     fOwner.value = loc.owner_email || "";
     fLang.value = loc.lang || "sl";
+    fTheme.value = loc.theme || "classic";
     formTitle.textContent = "Uredi lokacijo: " + loc.id;
     formMsg.textContent = "";
     formMsg.className = "form-msg";
@@ -272,6 +275,7 @@
       google_review_url: fUrl.value.trim(),
       owner_email: fOwner.value.trim() || null,
       lang: fLang.value || "sl",
+      theme: fTheme.value || "classic",
     };
     if (!loc.id || !loc.name || !loc.google_review_url) return;
 

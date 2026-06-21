@@ -587,6 +587,27 @@ table.locations td.num {
   background: #fbeaea;
 }
 
+/* izbirnik teme v tabeli lokacij */
+.row-select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 0.86rem;
+  font-family: inherit;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+.row-select:focus {
+  outline: none;
+  border-color: var(--green);
+}
+.row-select.saved {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(29, 158, 117, 0.18);
+}
+
 /* login zaslon */
 .login-overlay {
   min-height: 100vh;
@@ -1193,4 +1214,44 @@ html {
 }
 .qr-btn-primary:hover {
   background: #4a5ce6;
+}
+
+/* ============================================================
+   TEME REVIEW STRANI (po lokaciji, html[data-theme="..."])
+   Opomba: --green deluje kot "primarna barva" gumba na review strani.
+   classic = privzete vrednosti iz :root.
+   ============================================================ */
+html[data-theme="ocean"] {
+  --green: #0ea5a4;
+  --green-dark: #0c8e8d;
+}
+
+html[data-theme="sunset"] {
+  --green: #ef7c1a;
+  --green-dark: #d96a0e;
+  --bg: #fff8f1;
+}
+
+html[data-theme="indigo"] {
+  --green: #5b6ef5;
+  --green-dark: #4a5ce6;
+}
+
+html[data-theme="dark"] {
+  --bg: #0e1320;
+  --text: #eef1f7;
+  --text-muted: #9aa5b8;
+  --border: #2a3346;
+  --green: #6c7cf5;
+  --green-dark: #5563ec;
+  --blue: #3b82f6;
+  --blue-dark: #2f6fe0;
+  --star-off: #3a4358;
+}
+html[data-theme="dark"] textarea {
+  background: #161c2b;
+  color: var(--text);
+}
+html[data-theme="dark"] textarea::placeholder {
+  color: #6b7689;
 }
