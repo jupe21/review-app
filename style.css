@@ -734,21 +734,16 @@ html {
   align-items: center;
 }
 .lp-logo img {
-  height: 32px;
+  height: 30px;
   width: auto;
   display: block;
 }
-.lp-logo-tag {
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.lp-logo-star {
+  font-size: 1.05rem;
+  font-weight: 800;
   color: var(--lp-indigo);
-  background: #eaecfe;
-  border-radius: 6px;
-  padding: 2px 7px;
+  letter-spacing: 0.01em;
   line-height: 1;
-  align-self: center;
 }
 .lp-nav-links {
   display: flex;
@@ -885,6 +880,42 @@ html {
   margin: 18px 0 0;
   font-size: 0.92rem;
   color: var(--lp-muted);
+}
+
+/* platforme – pas z logotipi */
+.lp-platforms {
+  padding: 32px 0;
+  background: var(--lp-soft);
+  border-top: 1px solid var(--lp-border);
+  border-bottom: 1px solid var(--lp-border);
+}
+.lp-platforms-label {
+  text-align: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--lp-muted);
+  margin: 0 0 20px;
+}
+.lp-platforms-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 36px;
+}
+.lp-plat {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--lp-muted);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.lp-plat img {
+  display: block;
+  opacity: 0.85;
 }
 
 /* sekcije */
