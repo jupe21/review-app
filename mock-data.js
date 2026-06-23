@@ -64,6 +64,21 @@
     { location_id: "test", rating: 1, comment: "Zelo slaba izkušnja, ne priporočam.", went_to_google: false, created_at: daysAgo(10), read_at: null },
   ].map((r) => ({ id: makeId(), ...r }));
 
+  // --- platforme za zbiranje ocen ------------------------------------------
+  const platforms = {
+    test: [
+      { id: "mp1", location_id: "test", platform: "google", url: "https://www.google.com/search?q=test+reviews", sort_order: 0 },
+    ],
+    ABC123: [
+      { id: "mp2", location_id: "ABC123", platform: "google", url: "https://www.google.com/search?q=kavarna+center+reviews", sort_order: 0 },
+      { id: "mp3", location_id: "ABC123", platform: "tripadvisor", url: "https://www.tripadvisor.com", sort_order: 1 },
+    ],
+    XYZ789: [
+      { id: "mp4", location_id: "XYZ789", platform: "google", url: "https://www.google.com/search?q=pri+lipi+reviews", sort_order: 0 },
+      { id: "mp5", location_id: "XYZ789", platform: "booking", url: "https://www.booking.com", sort_order: 1 },
+    ],
+  };
+
   // --- javni API ------------------------------------------------------------
   window.MockDB = {
     async getLocation(locationId) {
@@ -133,7 +148,33 @@
     async deleteLocation(id) {
       await new Promise((res) => setTimeout(res, 100));
       delete locations[id];
+      delete platforms[id];
       console.log("[MOCK] izbrisana lokacija:", id);
+    },
+
+    async getPlatforms(locationId) {
+      await new Promise((res) => setTimeout(res, 80));
+      return (platforms[locationId] || []).slice().sort((a, b) => a.sort_order - b.sort_order);
+    },
+
+    async upsertPlatform(p) {
+      await new Promise((res) => setTimeout(res, 100));
+      if (!platforms[p.location_id]) platforms[p.location_id] = [];
+      const arr = platforms[p.location_id];
+      const idx = arr.findIndex((x) => x.platform === p.platform);
+      const row = { id: "mp-" + Date.now(), ...p };
+      if (idx >= 0) arr[idx] = row;
+      else arr.push(row);
+      console.log("[MOCK] platforma upsert:", row);
+      return row;
+    },
+
+    async deletePlatform(locationId, platform) {
+      await new Promise((res) => setTimeout(res, 80));
+      if (platforms[locationId]) {
+        platforms[locationId] = platforms[locationId].filter((p) => p.platform !== platform);
+      }
+      console.log("[MOCK] platforma izbrisana:", locationId, platform);
     },
 
     async markRead(reviewId) {

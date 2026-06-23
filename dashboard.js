@@ -199,8 +199,10 @@
           '<td><select class="row-select" data-theme-for="' + escapeHtml(r.id) + '">' +
           (themeOpts ? themeOpts(r.theme) : "") +
           "</select></td>" +
-          '<td class="num"><button class="row-btn" data-qr="' + escapeHtml(r.id) +
-          '" data-qr-name="' + escapeHtml(r.name) + '">QR</button></td>' +
+          '<td class="num" style="white-space:nowrap">' +
+          '<button class="row-btn" data-platforms="' + escapeHtml(r.id) +
+          '" data-platforms-name="' + escapeHtml(r.name) + '">Platforme / QR</button>' +
+          "</td>" +
           "</tr>"
       )
       .join("");
@@ -258,10 +260,17 @@
   }
 
   // --- interakcije ----------------------------------------------------------
-  // QR koda za lokacijo
+  // Platforme / QR gumb
   document.getElementById("loc-body").addEventListener("click", (e) => {
-    const qrBtn = e.target.closest("[data-qr]");
-    if (qrBtn && window.QR) window.QR.open(qrBtn.dataset.qr, qrBtn.dataset.qrName);
+    const pmBtn = e.target.closest("[data-platforms]");
+    if (pmBtn && window.PlatformMgr) {
+      window.PlatformMgr.open({
+        locationId: pmBtn.dataset.platforms,
+        locationName: pmBtn.dataset.platformsName,
+        sb: sb,
+        useMock: USE_MOCK,
+      });
+    }
   });
 
   // sprememba teme lokacije (shrani takoj)

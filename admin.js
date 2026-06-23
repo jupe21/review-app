@@ -173,8 +173,8 @@
           '<td class="num">' + s.count + "</td>" +
           '<td class="num">' + starAvg(avg) + "</td>" +
           '<td class="num" style="white-space:nowrap">' +
-          '<button class="row-btn" data-qr="' + escapeHtml(l.id) +
-          '" data-qr-name="' + escapeHtml(l.name) + '">QR</button> ' +
+          '<button class="row-btn" data-platforms="' + escapeHtml(l.id) +
+          '" data-platforms-name="' + escapeHtml(l.name) + '">Platforme</button> ' +
           '<button class="row-btn" data-edit="' + data + '">Uredi</button> ' +
           '<button class="row-btn danger" data-del="' + escapeHtml(l.id) + '">Izbriši</button>' +
           "</td>" +
@@ -272,12 +272,12 @@
     const loc = {
       id: fId.value.trim(),
       name: fName.value.trim(),
-      google_review_url: fUrl.value.trim(),
+      google_review_url: fUrl.value.trim() || null,
       owner_email: fOwner.value.trim() || null,
       lang: fLang.value || "sl",
       theme: fTheme.value || "classic",
     };
-    if (!loc.id || !loc.name || !loc.google_review_url) return;
+    if (!loc.id || !loc.name) return;
 
     saveBtn.disabled = true;
     formMsg.textContent = "Shranjujem…";
@@ -297,11 +297,16 @@
     }
   }
 
-  // klik v tabeli (uredi / izbriši)
+  // klik v tabeli (platforme / uredi / izbriši)
   locBody.addEventListener("click", async (e) => {
-    const qrBtn = e.target.closest("[data-qr]");
-    if (qrBtn) {
-      if (window.QR) window.QR.open(qrBtn.dataset.qr, qrBtn.dataset.qrName);
+    const pmBtn = e.target.closest("[data-platforms]");
+    if (pmBtn && window.PlatformMgr) {
+      window.PlatformMgr.open({
+        locationId: pmBtn.dataset.platforms,
+        locationName: pmBtn.dataset.platformsName,
+        sb: sb,
+        useMock: USE_MOCK,
+      });
       return;
     }
     const editBtn = e.target.closest("[data-edit]");

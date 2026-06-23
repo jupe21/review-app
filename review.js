@@ -1,4 +1,4 @@
-// review.js – logika review strani (index.html)
+// review.js – logika review strani (review.html)
 
 (function () {
   "use strict";
@@ -13,11 +13,10 @@
       rate_title: "Kako zadovoljni ste bili?",
       rate_subtitle: "Vaše mnenje nam veliko pomeni.",
       next: "Naprej",
-      next_google: "Naprej na Google",
-      hint5: "Super! Kliknite za oddajo ocene na Googlu.",
-      four_title: "Hvala za oceno!",
-      four_subtitle: "Bi nam pomagali z oceno tudi na Googlu? Traja le trenutek.",
-      open_google: "Odpri Google recenzije",
+      next_review: "Naprej na oceno",
+      hint5: "Super! Kliknite za oddajo ocene.",
+      platform_title: "Odlično!",
+      platform_subtitle: "Kje bi nas ocenili?",
       no_thanks: "Raje ne, hvala",
       feedback_title: "Žal nam je.",
       feedback_subtitle: "Povejte nam, kaj je šlo narobe in popravili bomo.",
@@ -36,11 +35,10 @@
       rate_title: "How satisfied were you?",
       rate_subtitle: "Your feedback means a lot to us.",
       next: "Next",
-      next_google: "Continue to Google",
-      hint5: "Great! Tap to leave your review on Google.",
-      four_title: "Thanks for your rating!",
-      four_subtitle: "Would you help us with a Google review too? It only takes a moment.",
-      open_google: "Open Google reviews",
+      next_review: "Continue to review",
+      hint5: "Great! Tap to leave your review.",
+      platform_title: "Excellent!",
+      platform_subtitle: "Where would you like to leave a review?",
       no_thanks: "No thanks",
       feedback_title: "We're sorry.",
       feedback_subtitle: "Tell us what went wrong and we will make it right.",
@@ -77,7 +75,7 @@
     document.documentElement.setAttribute("data-theme", theme || "classic");
   }
 
-  // --- Supabase client (samo kadar ni mock) ---------------------------------
+  // --- Supabase client ------------------------------------------------------
   let sb = null;
   if (!USE_MOCK) {
     if (!window.supabase || !cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY) {
@@ -87,32 +85,36 @@
     }
   }
 
-  // --- Data layer (Supabase ali Mock) ---------------------------------------
+  // --- Data layer -----------------------------------------------------------
   async function getLocation(locationId) {
     if (USE_MOCK) return window.MockDB.getLocation(locationId);
     if (!sb) return null;
-    // select("*") namesto naštevanja stolpcev: deluje tudi, če stolpec 'lang'
-    // (še) ne obstaja – takrat se jezik privzeto nastavi na 'sl'.
     const { data, error } = await sb
       .from("locations")
       .select("*")
       .eq("id", locationId)
       .maybeSingle();
-    if (error) {
-      console.error("Napaka pri branju lokacije:", error);
-      return null;
-    }
+    if (error) { console.error("Napaka pri branju lokacije:", error); return null; }
     return data;
+  }
+
+  async function getLocationPlatforms(locationId) {
+    if (USE_MOCK) return window.MockDB.getPlatforms(locationId);
+    if (!sb) return [];
+    const { data, error } = await sb
+      .from("location_platforms")
+      .select("platform, url, sort_order")
+      .eq("location_id", locationId)
+      .order("sort_order");
+    if (error) { console.error("Napaka pri branju platform:", error); return []; }
+    return data || [];
   }
 
   async function insertReview(review) {
     if (USE_MOCK) return window.MockDB.insertReview(review);
     if (!sb) throw new Error("Supabase ni na voljo");
     const { error } = await sb.from("reviews").insert(review);
-    if (error) {
-      console.error("Napaka pri shranjevanju mnenja:", error);
-      throw error;
-    }
+    if (error) { console.error("Napaka pri shranjevanju mnenja:", error); throw error; }
   }
 
   // --- DOM ------------------------------------------------------------------
@@ -120,9 +122,8 @@
   const starBtns = Array.from(starsEl.querySelectorAll(".star"));
   const hintEl = document.getElementById("rate-hint");
   const btnNext = document.getElementById("btn-next");
-
-  const btnFourGoogle = document.getElementById("btn-four-google");
-  const btnFourNo = document.getElementById("btn-four-no");
+  const btnSkipPlatform = document.getElementById("btn-skip-platform");
+  const platformBtnsEl = document.getElementById("platform-btns");
   const btnSend = document.getElementById("btn-send");
   const feedbackText = document.getElementById("feedback-text");
   const errorText = document.getElementById("error-text");
@@ -134,7 +135,9 @@
     rating: 0,
     locationId: null,
     location: null,
-    saved: false, // prepreči dvojno shranjevanje
+    platforms: [],      // [{platform, url, sort_order}]
+    urlPlatform: null,  // vrednost ?platform= iz URL-ja (za QR po platformi)
+    saved: false,
   };
 
   // --- pomožne --------------------------------------------------------------
@@ -145,20 +148,19 @@
 
   function paintStars(upTo) {
     starBtns.forEach((b) => {
-      const v = Number(b.dataset.value);
-      b.classList.toggle("active", v <= upTo);
+      b.classList.toggle("active", Number(b.dataset.value) <= upTo);
     });
   }
 
   function setRating(r) {
     state.rating = r;
     paintStars(r);
-
-    if (r === 5) {
-      btnNext.textContent = t("next_google");
-      btnNext.classList.add("btn-google");
-      hintEl.textContent = t("hint5");
-      hintEl.classList.add("show");
+    const hasPlatforms = state.platforms.length > 0;
+    if (r >= 4) {
+      btnNext.textContent = hasPlatforms ? t("next_review") : t("next_review");
+      btnNext.classList.toggle("btn-google", !hasPlatforms && r === 5);
+      hintEl.textContent = r === 5 ? t("hint5") : "";
+      hintEl.classList.toggle("show", r === 5);
     } else {
       btnNext.textContent = t("next");
       btnNext.classList.remove("btn-google");
@@ -168,24 +170,13 @@
     btnNext.disabled = false;
   }
 
-  function redirectToGoogle() {
-    const url = state.location && state.location.google_review_url;
-    if (url) {
-      window.location.href = url;
-    } else {
-      // brez URL-ja vsaj prikaži zahvalo
-      showThanks(t("rating_thanks_title"), t("rating_thanks_subtitle"));
-    }
-  }
-
   function showThanks(title, sub) {
     if (title) thanksTitle.textContent = title;
     if (sub) thanksSub.textContent = sub;
     showStep("step-thanks");
   }
 
-  // Shrani natanko enkrat. Vrne true ob uspehu (oz. ko ne želimo blokirati).
-  async function saveOnce(rating, comment, wentToGoogle) {
+  async function saveOnce(rating, comment, wentToReview) {
     if (state.saved) return true;
     state.saved = true;
     try {
@@ -193,64 +184,93 @@
         location_id: state.locationId,
         rating: rating,
         comment: comment || null,
-        went_to_google: !!wentToGoogle,
+        went_to_google: !!wentToReview,
       });
       return true;
     } catch (e) {
-      // Ne blokiraj uporabnika ob napaki shranjevanja – dovoli nadaljevanje.
       state.saved = false;
       return false;
     }
   }
 
   function lockButtons(locked) {
-    [btnNext, btnFourGoogle, btnFourNo, btnSend].forEach((b) => {
-      if (b) b.disabled = locked;
+    [btnNext, btnSkipPlatform, btnSend].forEach((b) => { if (b) b.disabled = locked; });
+    platformBtnsEl.querySelectorAll("button").forEach((b) => { b.disabled = locked; });
+  }
+
+  // Resolviraj platforme glede na state.urlPlatform in state.location (fallback)
+  function resolvedPlatforms() {
+    let ps = state.platforms;
+    // Če je v URL-ju ?platform=X, filtriraj samo na tisto
+    if (state.urlPlatform) {
+      const match = ps.find((p) => p.platform === state.urlPlatform);
+      if (match) return [match];
+    }
+    // Fallback na google_review_url za stare lokacije brez platform
+    if (ps.length === 0 && state.location && state.location.google_review_url) {
+      return [{ platform: "google", url: state.location.google_review_url }];
+    }
+    return ps;
+  }
+
+  function buildPlatformButtons(platforms) {
+    platformBtnsEl.innerHTML = "";
+    platforms.forEach((p) => {
+      const meta = window.platformById ? window.platformById(p.platform) : { label: p.platform };
+      const btn = document.createElement("button");
+      btn.className = "btn btn-platform";
+      btn.textContent = meta.label;
+      btn.addEventListener("click", async () => {
+        lockButtons(true);
+        await saveOnce(state.rating, null, true);
+        window.location.href = p.url;
+      });
+      platformBtnsEl.appendChild(btn);
     });
   }
 
   // --- event listenerji -----------------------------------------------------
-  // hover preview
   starBtns.forEach((b) => {
     b.addEventListener("mouseenter", () => paintStars(Number(b.dataset.value)));
     b.addEventListener("click", () => setRating(Number(b.dataset.value)));
   });
   starsEl.addEventListener("mouseleave", () => paintStars(state.rating));
 
-  // glavni "Naprej" gumb
   btnNext.addEventListener("click", async () => {
     if (state.rating === 0) return;
 
-    if (state.rating === 5) {
+    if (state.rating <= 3) {
+      showStep("step-feedback");
+      feedbackText.focus();
+      return;
+    }
+
+    // Rating 4 ali 5: prikaži platforme
+    const ps = resolvedPlatforms();
+    if (ps.length === 0) {
+      // res ni ničesar konfiguriranega
+      await saveOnce(state.rating, null, false);
+      showThanks(t("rating_thanks_title"), t("rating_thanks_subtitle"));
+      return;
+    }
+    if (ps.length === 1 && state.rating === 5) {
+      // direkten redirect (5 zvezdic + ena platforma)
       lockButtons(true);
       await saveOnce(5, null, true);
-      redirectToGoogle();
+      window.location.href = ps[0].url;
       return;
     }
-    if (state.rating === 4) {
-      showStep("step-four");
-      return;
-    }
-    // 1–3
-    showStep("step-feedback");
-    feedbackText.focus();
+    // 4 zvezde ali več platform – prikaži izbiro
+    buildPlatformButtons(ps);
+    showStep("step-platform");
   });
 
-  // 4 zvezde – gre na Google
-  btnFourGoogle.addEventListener("click", async () => {
+  btnSkipPlatform.addEventListener("click", async () => {
     lockButtons(true);
-    await saveOnce(4, null, true);
-    redirectToGoogle();
-  });
-
-  // 4 zvezde – raje ne
-  btnFourNo.addEventListener("click", async () => {
-    lockButtons(true);
-    await saveOnce(4, null, false);
+    await saveOnce(state.rating, null, false);
     showThanks(t("rating_thanks_title"), t("rating_thanks_subtitle"));
   });
 
-  // 1–3 zvezde – pošlji feedback
   btnSend.addEventListener("click", async () => {
     lockButtons(true);
     const comment = feedbackText.value.trim();
@@ -262,11 +282,12 @@
   async function init() {
     const params = new URLSearchParams(window.location.search);
     const urlLang = (params.get("lang") || "").trim().toLowerCase();
-    // Jezik iz URL-ja (npr. ?lang=en) takoj uveljavi – brez utripa.
     if (urlLang) setLang(urlLang);
 
     const urlTheme = (params.get("theme") || "").trim().toLowerCase();
     if (urlTheme) setTheme(urlTheme);
+
+    state.urlPlatform = (params.get("platform") || "").trim().toLowerCase() || null;
 
     const loc = (params.get("loc") || "").trim();
     if (!loc) {
@@ -276,18 +297,21 @@
     }
     state.locationId = loc;
 
-    const location = await getLocation(loc);
+    const [location, platforms] = await Promise.all([
+      getLocation(loc),
+      getLocationPlatforms(loc),
+    ]);
+
     if (!location) {
       errorText.textContent = t("error_notfound");
       showStep("step-error");
       return;
     }
     state.location = location;
+    state.platforms = platforms;
 
-    // Jezik in tema lokacije (če nista že nastavljena prek URL-ja).
     if (!urlLang) setLang(location.lang || "sl");
     if (!urlTheme) setTheme(location.theme || "classic");
-    // korak za oceno je že privzeto aktiven
   }
 
   init();

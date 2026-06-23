@@ -28,15 +28,57 @@ create index if not exists reviews_read_at_idx      on reviews (read_at);
 create table if not exists locations (
   id                text primary key,
   name              text not null,
-  google_review_url text not null,
+  google_review_url text,           -- opcijsko; zastarelo – raje nastavi location_platforms
   owner_email       text,
   lang              text not null default 'sl',        -- jezik review strani: 'sl' ali 'en'
   theme             text not null default 'classic'    -- videz review strani (glej style.css)
 );
 
--- Za obstoječe baze (če stolpca še ne obstajata):
+-- Za obstoječe baze:
 alter table locations add column if not exists lang  text not null default 'sl';
 alter table locations add column if not exists theme text not null default 'classic';
+-- Sprosti NOT NULL na google_review_url (sedaj opcijsko)
+alter table locations alter column google_review_url drop not null;
+
+-- ------------------------------------------------------------
+-- location_platforms tabela – platforme za zbiranje ocen
+-- ------------------------------------------------------------
+create table if not exists location_platforms (
+  id          uuid primary key default gen_random_uuid(),
+  location_id text not null references locations(id) on delete cascade,
+  platform    text not null,   -- 'google', 'tripadvisor', 'booking', 'facebook', 'yelp', 'airbnb'
+  url         text not null,
+  sort_order  int  not null default 0,
+  unique(location_id, platform)
+);
+create index if not exists lp_location_idx on location_platforms(location_id);
+alter table location_platforms enable row level security;
+
+-- anon (review stran) bere platforme lokacije
+drop policy if exists "anon read platforms" on location_platforms;
+create policy "anon read platforms"
+  on location_platforms for select to anon using (true);
+
+-- lastnik upravlja platforme svojih lokacij
+drop policy if exists "owner manage platforms" on location_platforms;
+create policy "owner manage platforms"
+  on location_platforms for all to authenticated
+  using (exists (
+    select 1 from locations
+    where locations.id = location_platforms.location_id
+    and locations.owner_email = (select auth.jwt() ->> 'email')
+  ))
+  with check (exists (
+    select 1 from locations
+    where locations.id = location_platforms.location_id
+    and locations.owner_email = (select auth.jwt() ->> 'email')
+  ));
+
+-- admin ima poln dostop do platform
+drop policy if exists "admin manage platforms" on location_platforms;
+create policy "admin manage platforms"
+  on location_platforms for all to authenticated
+  using (is_admin()) with check (is_admin());
 
 -- ------------------------------------------------------------
 -- Row Level Security (RLS)

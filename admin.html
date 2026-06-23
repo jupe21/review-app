@@ -70,7 +70,7 @@
               <div class="value" id="m-avg">–</div>
             </div>
             <div class="metric">
-              <div class="label">Preusmeritve na Google</div>
+              <div class="label">Preusmeritve na ocene</div>
               <div class="value" id="m-google">–</div>
               <div class="sub" id="m-google-sub">&nbsp;</div>
             </div>
@@ -107,8 +107,8 @@
                 <input id="f-name" type="text" placeholder="npr. Kavarna Center" required />
               </label>
               <label>
-                Google Review URL
-                <input id="f-url" type="url" placeholder="https://search.google.com/local/writereview?placeid=..." required />
+                Google Review URL <span class="muted">(opcijsko – raje nastavi platforme po shranjevanju)</span>
+                <input id="f-url" type="url" placeholder="https://search.google.com/local/writereview?placeid=..." />
               </label>
               <label>
                 Lastnik – e-pošta <span class="muted">(prijavna e-pošta lastnika)</span>
@@ -148,6 +148,7 @@
                   <th class="num">Povp.</th>
                   <th></th>
                 </tr>
+                <!-- colspan=6 -->
               </thead>
               <tbody id="loc-body">
                 <tr>
@@ -165,7 +166,9 @@
     <script src="config.js"></script>
     <script src="mock-data.js"></script>
     <script src="themes.js"></script>
+    <script src="platforms.js"></script>
     <script src="qr.js"></script>
+    <script src="platform-modal.js"></script>
     <script src="admin.js"></script>
   </body>
 </html>

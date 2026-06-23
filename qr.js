@@ -76,13 +76,14 @@
     });
   }
 
-  function open(id, name) {
+  // url je opcijsko – pri platformno-specifičnih QR kodah podaj polni URL
+  function open(id, name, url) {
     if (!window.QRCodeStyling) {
       alert("QR knjižnica se ni naložila. Osvežite stran in poskusite znova.");
       return;
     }
     ensureModal();
-    current = { id: id, name: name || id, url: reviewUrl(id) };
+    current = { id: id, name: name || id, url: url || reviewUrl(id) };
     titleEl.textContent = current.name;
     urlEl.textContent = current.url;
     qrBox.innerHTML = "";

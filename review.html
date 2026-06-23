@@ -28,15 +28,13 @@
           <button class="btn" id="btn-next" data-i18n="next" disabled>Naprej</button>
         </section>
 
-        <!-- KORAK 2: vmesni korak za 4 zvezde -->
-        <section id="step-four" class="step">
-          <div class="thanks-icon">🙂</div>
-          <h1 data-i18n="four_title">Hvala za oceno!</h1>
-          <p class="subtitle" data-i18n="four_subtitle">
-            Bi nam pomagali z oceno tudi na Googlu? Traja le trenutek.
-          </p>
-          <button class="btn btn-google" id="btn-four-google" data-i18n="open_google">Odpri Google recenzije</button>
-          <button class="btn-link" id="btn-four-no" data-i18n="no_thanks">Raje ne, hvala</button>
+        <!-- KORAK 2: izbira platforme (za 4–5 zvezdic) -->
+        <section id="step-platform" class="step">
+          <div class="thanks-icon">🌟</div>
+          <h1 data-i18n="platform_title">Odlično!</h1>
+          <p class="subtitle" data-i18n="platform_subtitle">Kje bi nas ocenili?</p>
+          <div id="platform-btns" class="platform-btns"></div>
+          <button class="btn-link" id="btn-skip-platform" data-i18n="no_thanks">Raje ne, hvala</button>
         </section>
 
         <!-- KORAK 3: feedback za 1 do 3 zvezde -->
@@ -74,6 +72,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>
     <script src="mock-data.js"></script>
+    <script src="platforms.js"></script>
     <script src="review.js"></script>
   </body>
 </html>
