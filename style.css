@@ -740,10 +740,11 @@ html {
   display: block;
 }
 .lp-logo-star {
-  font-size: 1.75rem;
-  font-weight: 800;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem;
+  font-weight: 400;
   color: var(--lp-text);
-  letter-spacing: -0.02em;
+  letter-spacing: 0.04em;
   line-height: 1;
 }
 .lp-nav-links {
