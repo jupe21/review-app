@@ -732,6 +732,7 @@ html {
 .lp-logo {
   display: flex;
   align-items: center;
+  text-decoration: none;
 }
 .lp-logo img {
   height: 30px;
@@ -739,10 +740,10 @@ html {
   display: block;
 }
 .lp-logo-star {
-  font-size: 1.05rem;
+  font-size: 1.75rem;
   font-weight: 800;
-  color: var(--lp-indigo);
-  letter-spacing: 0.01em;
+  color: var(--lp-text);
+  letter-spacing: -0.02em;
   line-height: 1;
 }
 .lp-nav-links {
