@@ -732,20 +732,22 @@ html {
 .lp-logo {
   display: flex;
   align-items: center;
+  gap: 4px;
   text-decoration: none;
 }
 .lp-logo img {
-  height: 30px;
+  height: 34px;
   width: auto;
   display: block;
 }
 .lp-logo-star {
   font-family: 'Bebas Neue', sans-serif;
-  font-size: 2rem;
+  font-size: 2.3rem;
   font-weight: 400;
-  color: var(--lp-text);
-  letter-spacing: 0.04em;
+  color: #000;
+  letter-spacing: 0.05em;
   line-height: 1;
+  margin-bottom: -2px;
 }
 .lp-nav-links {
   display: flex;
